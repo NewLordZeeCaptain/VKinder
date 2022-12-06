@@ -9,7 +9,7 @@ class Course(Base):
     name = sq.Column(sq.String(length=40), unique=True)
     
     def __str__(self):
-        return f'{self.id}: {self.name}'
+        return f'Course: {self.id}: {self.name}'
     
     #homeworks = relationship("Homework", back_populates="course")
     
@@ -24,6 +24,9 @@ class Homework(Base):
     # course= relationship(Course, back_populates="homeworks")
     
     course = relationship(Course, backref="homeworks")
+    
+    def __str__(self):
+        return f'Homework: {self.id}: ({self.number}, {self.description}, {self.course_id})'
     
 def create_tables(engine):
     Base.metadata.drop_all(engine)
