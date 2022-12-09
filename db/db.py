@@ -1,5 +1,5 @@
 import vk_api
-from vk_api.longpoll import VkLongPoll, VkEventType
+from vk_api.longpoll import VkLongPoll
 from configs.config import GROUP_TOKEN
 from random import randrange
 import sqlalchemy as sq

@@ -23,50 +23,50 @@ def loop_bot():
 
 def menu_bot(id_num):
     write_msg(id_num,
-              f"Вас приветствует бот - Vkinder\n"
-              f"\nЕсли вы используете его первый раз - пройдите регистрацию.\n"
-              f"Для регистрации введите - Да.\n"
-              f"Если вы уже зарегистрированы - начинайте поиск.\n"
-              f"\nДля поиска - девушка 18-25 Москва\n"
-              f"Перейти в избранное нажмите - 2\n"
-              f"Перейти в черный список - 0\n")
+              f"Vkinder\n"
+              f"\nIf you're using it in first time you should registrate.\n"
+              f"To registrate say Да\n"
+              f"If you're allready in app start search\n"
+              f"\nObject for searc: female \n"
+              f"Press 2 to go to favorite\n"
+              f"Press 0 to go to blacklist\n")
 
 
 def show_info():
-    write_msg(user_id, f'Это была последняя анкета.'
-                       f'Перейти в избранное - 2'
-                       f'Перейти в черный список - 0'
-                       f'Поиск - девушка 18-35 белгород'
-                       f'Меню бота - Vkinder')
+    write_msg(user_id, f'It was last profile.'
+                       f'Go to favorite - 2'
+                       f'Go to blacklist - 0'
+                       f'Object: female'
+                       f'Menu')
 
 
 def reg_new_user(id_num):
-    write_msg(id_num, 'Вы прошли регистрацию.')
+    write_msg(id_num, 'Reg. Finished.')
     write_msg(id_num,
-              f"Vkinder - для активации бота\n")
+              f"Vkinder activated\n")
     register_user(id_num)
 
 
 def go_to_favorites(ids):
     alls_users = check_db_favorites(ids)
-    write_msg(ids, f'Избранные анкеты:')
+    write_msg(ids, f'Favorites:')
     for nums, users in enumerate(alls_users):
         write_msg(ids, f'{users.first_name}, {users.second_name}, {users.link}')
-        write_msg(ids, '1 - Удалить из избранного, 0 - Далее \nq - Выход')
+        write_msg(ids, '1 - Delete from favorite, 0 - Next \nq - Quit')
         msg_texts, user_ids = loop_bot()
         if msg_texts == '0':
             if nums >= len(alls_users) - 1:
-                write_msg(user_ids, f'Это была последняя анкета.\n'
-                                    f'Vkinder - вернуться в меню\n')
+                write_msg(user_ids, f'It was last profile.\n'
+                                    f'Menu\n')
         # Удаляем запись из бд - избранное
         elif msg_texts == '1':
             delete_db_favorites(users.vk_id)
-            write_msg(user_ids, f'Анкета успешно удалена.')
+            write_msg(user_ids, f'Profile deleted.')
             if nums >= len(alls_users) - 1:
-                write_msg(user_ids, f'Это была последняя анкета.\n'
-                                    f'Vkinder - вернуться в меню\n')
+                write_msg(user_ids, f'It was last profile\n'
+                                    f'Menu\n')
         elif msg_texts.lower() == 'q':
-            write_msg(ids, 'Vkinder - для активации бота.')
+            write_msg(ids, 'Vkinder activated.')
             break
 
 
@@ -75,22 +75,22 @@ def go_to_blacklist(ids):
     write_msg(ids, f'Анкеты в черном списке:')
     for num, user in enumerate(all_users):
         write_msg(ids, f'{user.first_name}, {user.second_name}, {user.link}')
-        write_msg(ids, '1 - Удалить из черного списка, 0 - Далее \nq - Выход')
+        write_msg(ids, '1 - delete from blacklist, 0 - Next\nq - Quit')
         msg_texts, user_ids = loop_bot()
         if msg_texts == '0':
             if num >= len(all_users) - 1:
-                write_msg(user_ids, f'Это была последняя анкета.\n'
-                                    f'Vkinder - вернуться в меню\n')
+                write_msg(user_ids, f'It was last profile.\n'
+                                    f'Menu\n')
         # Удаляем запись из бд - черный список
         elif msg_texts == '1':
             print(user.id)
             delete_db_blacklist(user.vk_id)
-            write_msg(user_ids, f'Анкета успешно удалена')
+            write_msg(user_ids, f'Profile deleted')
             if num >= len(all_users) - 1:
-                write_msg(user_ids, f'Это была последняя анкета.\n'
-                                    f'Vkinder - вернуться в меню\n')
+                write_msg(user_ids, f'It was last profile.\n'
+                                    f'Menu\n')
         elif msg_texts.lower() == 'q':
-            write_msg(ids, 'Vkinder - для активации бота.')
+            write_msg(ids, 'Vkinder activated.')
             break
 
 
@@ -112,11 +112,11 @@ if __name__ == '__main__':
                     sex = 2
                 age_at = msg_text[8:10]
                 if int(age_at) < 18:
-                    write_msg(user_id, 'ай яй яй, Выставлен минимальный возраст - 18 лет.')
+                    write_msg(user_id, 'Выставлен минимальный возраст - 18 лет.')
                     age_at = 18
                 age_to = msg_text[11:14]
                 if int(age_to) >= 100:
-                    write_msg(user_id, 'ой ёй ёй, выставлено максимальное значение 99 лет.')
+                    write_msg(user_id, 'Выставлено максимальное значение 99 лет.')
                     age_to = 99
                 city = msg_text[14:len(msg_text)].lower()
                 # Ищем анкеты
