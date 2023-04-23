@@ -1,11 +1,13 @@
-import vk_api
-from vk_api.longpoll import VkLongPoll
-from configs.config import GROUP_TOKEN
 from random import randrange
+
 import sqlalchemy as sq
+import vk_api
+from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import IntegrityError, InvalidRequestError
+from vk_api.longpoll import VkLongPoll
+
+from configs.config import GROUP_TOKEN
 
 # Подключение к БД
 Base = declarative_base()

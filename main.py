@@ -47,7 +47,7 @@ def menu_bot(id_num):
     )
 
 
-def show_info():
+def show_info(user_id):
     write_msg(
         user_id,
         f"It was last profile."
@@ -216,7 +216,7 @@ def main():
                     elif msg_text == "2":
                         # Проверка на последнюю запись
                         if i >= len(result) - 1:
-                            show_info()
+                            show_info(user_id)
                         # Блокируем
                         add_to_black_list(
                             user_id,
