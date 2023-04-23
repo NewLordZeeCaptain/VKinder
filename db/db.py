@@ -13,7 +13,7 @@ from configs.config import GROUP_TOKEN
 Base = declarative_base()
 
 
-engine = sq.create_engine("postgresql://user@localhost:5432/vkinder_db")
+engine = sq.create_engine("postgresql://postgres:postgres@188.225.60.104:5432/postgres")
 Session = sessionmaker(bind=engine)
 
 # Для работы с ВК
@@ -211,5 +211,4 @@ def add_to_black_list(
         return False
 
 
-if __name__ == "__main__":
-    Base.metadata.create_all(engine)
+Base.metadata.create_all(engine)
