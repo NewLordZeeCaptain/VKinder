@@ -13,7 +13,7 @@ from configs.config import GROUP_TOKEN
 Base = declarative_base()
 
 
-engine = sq.create_engine("postgresql://postgres:postgres@188.225.60.104:5432/postgres")
+engine = sq.create_engine("postgresql://postgres:postgres@92.51.36.19:5432/postgres")
 Session = sessionmaker(bind=engine)
 
 # Для работы с ВК
@@ -128,16 +128,22 @@ def write_msg(user_id, message, attachment=None):
         },
     )
 
+def register_user(ids):
+    user = session.query(User).filter_by(vk_id=ids).first()
+    if user != None:
+        session.add(User(vk_id=ids))
+        session.commit()
+    
 
 # Регистрация пользователя
-def register_user(vk_id):
-    try:
-        new_user = User(vk_id=vk_id)
-        session.add(new_user)
-        session.commit()
-        return True
-    except (IntegrityError, InvalidRequestError):
-        return False
+# def register_user(vk_id):
+#     try:
+#         new_user = User(vk_id=vk_id)
+#         session.add(new_user)
+#         session.commit()
+#         return True
+#     except (IntegrityError, InvalidRequestError):
+#         return False
 
 
 # Сохранение выбранного пользователя в БД

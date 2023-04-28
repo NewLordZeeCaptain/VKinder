@@ -1,6 +1,6 @@
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
-from functions.vk_functions import search_users, get_photo, sort_likes, json_create
+from functions.user_functions import search_users, get_photo, sort_likes, json_create
 from db.db import (
     engine,
     Session,
@@ -110,6 +110,12 @@ def go_to_blacklist(ids):
 def main():
     while True:
         msg_text, user_id = loop_bot()
+        print(msg_text,user_id)
+        match msg_text:
+            case "начать":
+                register_user(user_id)
+            
+                
         if msg_text == "vkinder":
             menu_bot(user_id)
             msg_text, user_id = loop_bot()
