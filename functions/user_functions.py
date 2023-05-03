@@ -16,7 +16,7 @@ from random import randrange
 
 
 class User(object):
-    """User class is used to interact with user api"""
+    """User class is used to interact with user api and get user data"""
 
     def __init__(self, USER_TOKEN):
         # super(User, self).__init__()
@@ -27,13 +27,13 @@ class User(object):
             "users.get",
             {
                 "user_ids": vk_id,
-                "fields": "nickname,sex,city,interests,has_photo,photo_id",
+                "fields": "sex,city,interests,has_photo,photo_id",
             },
         )
         return response[0]
 
-    def search_user(self, sex, age_at, age_to, city):
-        all_ersons = []
+    def search_user(self, city, sex=0, age_at=18, age_to=100):
+        all_persons = []
         link_profile = "https://vk.com/id"
         response = self.vk.method(
             "users.search",
@@ -46,7 +46,7 @@ class User(object):
                 "has_photo": 1,
                 "count": 25,
                 "online": 1,
-                "hometown": city,
+                "city": city,
             },
         )
         for element in response["items"]:
@@ -57,7 +57,10 @@ class User(object):
                 element["id"],
             ]
             all_persons.append(person)
-        return all_persons
+        person_dict = dict()
+        for k, v in enumerate(all_persons):
+            person_dict[k] = v
+        return person_dict
 
     def get_photo(self, user_owner_id):
         try:
@@ -100,8 +103,6 @@ class User(object):
         Sorting, Responce & JSON
         """
 
-    
-
     def json_create(self, lst):
         today = datetime.date.today()
         today_str = f"{today.day}.{today.month}.{today.year}"
@@ -130,6 +131,25 @@ class User(object):
                 "attachment": attachment,
             },
         )
+
+    def get_countries(self):
+        resp = self.vk.method(
+            "database.getCountries",
+            {
+                "code": "RU,UA,BY",
+            },
+        )["items"]
+        country_dict = dict()
+        for i in range(3):
+            country_dict[resp[i][id]] = resp[i][title]
+        print(country_dict)
+        return country_dict
+
+    def get_city(self, search, count=1):
+        resp = self.vk.method(
+            "database.getCities", {"country_id": 1, "q": search, "count": count}
+        )
+        return  resp["items"][0]
 
 
 """ 
