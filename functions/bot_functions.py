@@ -3,7 +3,7 @@ from random import randrange
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from configs.config import CALLBACK_TYPES  # GROUP_TOKEN, USER_TOKEN,
-
+from keyboard.keyboard import *
 from db.db import DB
 
 # from functions.user_functions import User
@@ -26,7 +26,7 @@ class Bot(object):
 
     def get_event(self):
         for event in self.longpoll.listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.from_me == False:
+            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 return event
 
     def start(self):
@@ -46,14 +46,20 @@ class Bot(object):
     def test(self, user_id, vk_id):
         self.db.add_to_blacklist(user_id, vk_id)
 
+    def sender(self, user_id, text, keyboard):
+        self.vk.method(
+            "messages.send",
+            {"user_id": user_id, "message": text, "random_id": 0, "keyboard": keyboard},
+        )
+
     def bot_menu(self, event):
-        command_list = ["Поиск", "Избранные", "Blacklist"]
+        self.sender(str(event.user_id), event.text.lower(), keyboard)
         match event.text.lower():
             case "начать":
                 self.greating(event.user_id)
                 self.db.register_user(event.user_id)
 
-            case "избранные":
+            case "избранное":
                 fav = self.db.check_db_favorites(event.user_id)
                 self.write_msg(event.user_id, "Выполняем поиск\n")
                 self.write_msg(event.user_id, fav)
@@ -72,7 +78,7 @@ class Bot(object):
                     for k, v in black.items():
                         self.write_msg(event.user_id, f"{k} - {v}")
 
-            case "поиск":
+            case "начать поиск":
                 sex = 0
                 age_at = 18
                 age_to = 100
@@ -81,31 +87,41 @@ class Bot(object):
                 except:
                     self.write_msg(event.user_id, "Укажите свой город: ")
                     event = self.get_event()
-                    print(event.text)
+                    # print(event.text)
                     city = self.db.user.get_city(event.text)["id"]
 
                 self.write_msg(
                     event.user_id,
-                    "Желаете добавить поиск по полу и возрасту? (1 - да, 0 - нет)",
+                    "Желаете добавить поиск по полу?",
+                )
+                self.sender(
+                    event.user_id, "Желаете добавить поиск по полу?", keyboard_search
                 )
                 event = self.get_event()
-                if event.text == "1":
-                    self.write_msg(
-                        event.user_id, "Укажите пол: Жен. - 1, Муж. - 2, Любой - 0"
-                    )
+                if event.text.lower() == "да":
+                    self.write_msg(event.user_id, "Укажите пол: ")
+                    self.sender(event.user_id, "Укажите пол", keyboard_sex)
                     event = self.get_event()
-                    match event.text:
-                        case "1":
+                    match event.text.lower():
+                        case "муж":
                             sex = 1
-                        case "2":
+                        case "жен":
                             sex = 2
-                        case "0":
+                        case "любой":
                             sex = 0
                         case other:
                             self.write_msg(
                                 event.user_id,
                                 'Было установлено значение по умолчанию( "Любой")',
                             )
+
+                self.sender(
+                    event.user_id,
+                    "Желаете добавить поиск по возрасту?",
+                    keyboard_search,
+                )
+                event = self.get_event()
+                if event.text.lower() == "да":
                     self.write_msg(event.user_id, "Укажите максимальный возраст: ")
                     event = self.get_event()
                     try:
@@ -140,6 +156,7 @@ class Bot(object):
                         "К сожалению мы ничего не нашли. Удачи в вечном одиночестве",
                     )
                 else:
+                    # TODO переписать так, чтобы выдавал только по одному
                     self.write_msg(
                         event.user_id,
                         "Вот несколько вариантов, что удовлетворяют вашим требованиям",
@@ -148,32 +165,50 @@ class Bot(object):
                     newline = "\n"
                     self.write_msg(
                         event.user_id,
-                        f"{newline.join(f'{k}: {v[0],v[2]}' for k, v in result.items())}",
+                        f"{newline.join(f'{k+1}: {v[0],v[2]}' for k, v in result.items())}",
                     )
-                    self.write_msg(
+                    self.sender(
                         event.user_id,
-                        "Желаете добавить кого-нибудь в избранное? 1 - да, 0 - нет",
+                        "Хотите взглянуть на чьё-нибудь фото?",
+                        keyboard_search,
                     )
                     event = self.get_event()
-                    if event.text == "1":
-                        self.write_msg(event.user_id, "Укажите номер ")
+                    if event.text.lower() == "да":
+                        # TODO отправка фото
+                        self.write_msg(event.user_id, "Пожалуйста укажите номер: ")
                         event = self.get_event()
-                        self.db.add_user(
-                            event.user_id,
-                            vk_id=result[int(event.text)][3],
-                            city=city,
-                            first_name=result[int(event.text)][0],
-                            last_name=result[int(event.text)][1],
-                        )
-                        self.write_msg(event.user_id, "Пользователь успешно добавлен")
+                        person_id = result[int(event.text) - 1][3]
 
+                        # self.write_msg(event.user_id, self.db.user.get_photo(person_id))
+                        for i in range(3):
+                            print(
+                                f"{self.db.user.get_photo(person_id)[i][1]}"
+                            )
+                            self.write_msg(
+                                event.user_id,
+                                f'№{i}',
+                                attachment=f"{self.db.user.get_photo(person_id)[i][1]}",
+                            )
+
+                #                     if event.text == "1":
+                #                         self.write_msg(event.user_id, "Укажите номер ")
+                #                         event = self.get_event()
+                #                         self.db.add_user(
+                #                             event.user_id,
+                #                             vk_id=result[int(event.text)][3],
+                #                             city=city,
+                #                             first_name=result[int(event.text)][0],
+                #                             last_name=result[int(event.text)][1],
+                #                         )
+                #                         self.write_msg(event.user_id, "Пользователь успешно добавлен")
+                # #
                 # for k, v in result.items():
                 #     self.write_msg(event.user_id, f"{k} - {v}")
                 return
             case other:
                 self.write_msg(
                     event.user_id,
-                    f"Такой команды нет, воспользуйтесь одной из этого списка\n{command_list}",
+                    f"Такой команды нет\n",
                 )
                 return
         # match event.type:

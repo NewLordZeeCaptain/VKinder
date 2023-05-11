@@ -44,7 +44,7 @@ class User(object):
                 "age_from": age_at,
                 "age_to": age_to,
                 "has_photo": 1,
-                "count": 25,
+                "count": 999,
                 "online": 1,
                 "city": city,
             },
