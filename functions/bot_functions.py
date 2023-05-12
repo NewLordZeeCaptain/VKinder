@@ -2,27 +2,25 @@ import vk_api
 from random import randrange
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
-from configs.config import CALLBACK_TYPES  # GROUP_TOKEN, USER_TOKEN,
+from configs.config import USER_TOKEN, GROUP_TOKEN
 from keyboard.keyboard import *
-from db.db import DB
+from db.db import *
+from user_functions import *
 
 # from functions.user_functions import User
 
-kbsetting = dict()
 
 
 class Bot(object):
     """Used to interact with Vk Bot API with longpoll"""
 
-    def __init__(self, GROUP_TOKEN, USER_TOKEN, CONSTR):
+    def __init__(self, GROUP_TOKEN):
         super(Bot, self).__init__()
         # self.GROUP_TOKEN = GROUP_TOKEN
         self.USER_TOKEN = USER_TOKEN
-        self.CONSTR = CONSTR
-        self.kb = VkKeyboard()
         self.vk = vk_api.VkApi(token=GROUP_TOKEN)
-
         self.longpoll = VkLongPoll(self.vk)
+        self.offset=0
 
     def get_event(self):
         for event in self.longpoll.listen():
@@ -30,8 +28,6 @@ class Bot(object):
                 return event
 
     def start(self):
-        self.db = DB(self.CONSTR, self.USER_TOKEN)
-
         while True:
             event = self.get_event()
 
@@ -40,27 +36,36 @@ class Bot(object):
     def greating(self, user_id):
         self.write_msg(
             user_id=user_id,
-            message=f"Приветствую!\nЭтот бот заменит вам ныне не работающий Tinder и поможет найти близких людей\nВы были автоматически зарегистрированы, но можете в любой момент удалить свой профиль\nДля работы с ботом используйте кнопки ниже\n",
+            message=f"Приветствую!\nЭтот бот заменит вам ныне не работающий Tinder и поможет найти близких людей\nДля работы воспользуйтесь кнопками ниже\n",
         )
 
-    def test(self, user_id, vk_id):
-        self.db.add_to_blacklist(user_id, vk_id)
-
-    def sender(self, user_id, text, keyboard):
+    def sender(self, user_id, text, keyboard, attachment=None):
         self.vk.method(
             "messages.send",
-            {"user_id": user_id, "message": text, "random_id": 0, "keyboard": keyboard},
+            {
+                "user_id": user_id,
+                "message": text,
+                "random_id": 0,
+                "keyboard": keyboard,
+                "attachment": attachment,
+            },
         )
 
+    def create_config(self):
+        
+
     def bot_menu(self, event):
-        self.sender(str(event.user_id), event.text.lower(), keyboard)
+        self.sender(str(event.user_id), "Приветствую!", keyboard)
         match event.text.lower():
             case "начать":
-                self.greating(event.user_id)
-                self.db.register_user(event.user_id)
+                isreg = register_user(event.user_id)
+                if isreg:
+                    self.greating(event.user_id)
+                else:
+                    self.write_msg(event.user_id, "C Возвращением!")
 
             case "избранное":
-                fav = self.db.check_db_favorites(event.user_id)
+                fav = check_db_favorites(event.user_id)
                 self.write_msg(event.user_id, "Выполняем поиск\n")
                 self.write_msg(event.user_id, fav)
                 if type(fav) == type(" "):
@@ -70,7 +75,7 @@ class Bot(object):
                         self.write_msg(event.user_id, f"{k} - {v}")
 
             case "blacklist":
-                black = self.db.check_db_blacklist(event.user_id)
+                black = check_db_blacklist(event.user_id)
                 self.write_msg(event.user_id, "Выполняем поиск\n")
                 if type(black) == type(" "):
                     self.write_msg(event.user_id, black)
@@ -83,7 +88,7 @@ class Bot(object):
                 age_at = 18
                 age_to = 100
                 try:
-                    city = self.db.user.user_get(event.user_id)["city"]
+                    city = user_get(event.user_id)["city"]
                 except:
                     self.write_msg(event.user_id, "Укажите свой город: ")
                     event = self.get_event()
@@ -181,12 +186,10 @@ class Bot(object):
 
                         # self.write_msg(event.user_id, self.db.user.get_photo(person_id))
                         for i in range(3):
-                            print(
-                                f"{self.db.user.get_photo(person_id)[i][1]}"
-                            )
+                            print(f"{self.db.user.get_photo(person_id)[i][1]}")
                             self.write_msg(
                                 event.user_id,
-                                f'№{i}',
+                                f"№{i}",
                                 attachment=f"{self.db.user.get_photo(person_id)[i][1]}",
                             )
 
