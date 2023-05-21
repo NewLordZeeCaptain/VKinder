@@ -10,7 +10,6 @@ from user_functions import *
 # from functions.user_functions import User
 
 
-
 class Bot(object):
     """Used to interact with Vk Bot API with longpoll"""
 
@@ -20,7 +19,7 @@ class Bot(object):
         self.USER_TOKEN = USER_TOKEN
         self.vk = vk_api.VkApi(token=GROUP_TOKEN)
         self.longpoll = VkLongPoll(self.vk)
-        self.offset=0
+        self.offset = 0
 
     def get_event(self):
         for event in self.longpoll.listen():
@@ -28,10 +27,8 @@ class Bot(object):
                 return event
 
     def start(self):
-        while True:
-            event = self.get_event()
-
-            self.bot_menu(event)
+        event = self.get_event()
+        self.bot_menu(event)
 
     def greating(self, user_id):
         self.write_msg(
@@ -52,7 +49,7 @@ class Bot(object):
         )
 
     def create_config(self):
-        
+        pass
 
     def bot_menu(self, event):
         self.sender(str(event.user_id), "Приветствую!", keyboard)
