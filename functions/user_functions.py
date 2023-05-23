@@ -2,7 +2,7 @@ import vk_api
 from configs.config import USER_TOKEN
 from vk_api.exceptions import ApiError
 from random import randrange
-
+from pprint import pprint
 
 # Для работы с ВК
 vk = vk_api.VkApi(token=USER_TOKEN)
@@ -31,13 +31,19 @@ def user_get(vk_id):
     return response[0]
 
 
+def get_city(City):
+    response = vk.method("database.getCities", {"country_id": 1, "q": City})
+    pprint(response)
+    return response["items"][0]["id"]
+
+
 def search_user(city, offset=0, sex=0, age_from=18, age_to=100):
     # all_persons = []
-    link_profile = "https://vk.com/id"
+    
     response = vk.method(
         "users.search",
         {
-            "sort": 1,
+            "sort": 0,
             "sex": sex,
             "status": 1,
             "age_from": age_from,

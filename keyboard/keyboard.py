@@ -26,7 +26,8 @@ keyboard_match = {
     "buttons": [
         [get_button("Дальше", "primary")],
         [get_button("В избранное", "secondary")],
-        [get_button("Blacklist")],
+        [get_button("Blacklist", "secondary")],
+        [get_button("назад", "secondary")],
     ],
 }
 keyboard_search = {

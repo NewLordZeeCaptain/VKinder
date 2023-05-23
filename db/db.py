@@ -3,19 +3,19 @@ import sqlalchemy as sq
 # from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from sqlalchemy.orm import sessionmaker
 from configs.config import CONSTR
-from db.models import Base, Favorite, Blacklist, User
+from db.models import *
 
 
 # Подключение к БД
-session = ''
 
-def create_db():
-    engine = sq.create_engine(CONSTR)
-    Session = sessionmaker(bind=engine)
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-    session = Session()
 
+    
+Session = sessionmaker(bind=sq.create_engine(CONSTR))
+Base.metadata.drop_all(sq.create_engine(CONSTR))
+print("Drop DB")
+Base.metadata.create_all(sq.create_engine(CONSTR))
+print("Create DB")
+session = Session()
 
 
 """ 
@@ -65,7 +65,7 @@ def delete_db_favorites(user_id, vk_id):
 
 
 def register_user(user_id):
-    user = self.session.query(User).filter_by(vk_id=user_id).first()
+    user = session.query(User).filter_by(vk_id=user_id).first()
     if user == None:
         session.add(User(vk_id=user_id))
         session.commit()

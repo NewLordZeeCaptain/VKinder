@@ -305,3 +305,35 @@ def search_users(sex, age_at, age_to, city):
 #             event_id, "Невозможно добавить фото этого пользователя(Уже сохранено)"
 #         )
 #         return False
+
+
+                    # if event.text.lower() == "да":
+                    #     # TODO отправка фото
+                    #     self.write_msg(event.user_id, "Пожалуйста укажите номер: ")
+                    #     event = self.get_event()
+                    #     person_id = result[int(event.text) - 1][3]
+
+                    #     # self.write_msg(event.user_id, self.db.user.get_photo(person_id))
+                    #     for i in range(3):
+                    #         print(f"{self.db.user.get_photo(person_id)[i][1]}")
+                    #         self.write_msg(
+                    #             event.user_id,
+                    #             f"№{i}",
+                    #             attachment=f"{self.db.user.get_photo(person_id)[i][1]}",
+                    #         )
+
+                #                     if event.text == "1":
+                #                         self.write_msg(event.user_id, "Укажите номер ")
+                #                         event = self.get_event()
+                #                         self.db.add_user(
+                #                             event.user_id,
+                #                             vk_id=result[int(event.text)][3],
+                #                             city=city,
+                #                             first_name=result[int(event.text)][0],
+                #                             last_name=result[int(event.text)][1],
+                #                         )
+                #                         self.write_msg(event.user_id, "Пользователь успешно добавлен")
+                # #
+                # for k, v in result.items():
+                #     self.write_msg(event.user_id, f"{k} - {v}")
+                

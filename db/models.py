@@ -14,12 +14,16 @@ class User(Base):
 class Favorite(Base):
     __tablename__ = "favorite"
     id = sq.Column(sq.Integer, primary_key=True, autoincrement=True)
+    first_name = sq.Column(sq.String)
+    last_name = sq.Column(sq.String)
+    photos = sq.Column(sq.String)
     vk_id = sq.Column(sq.Integer, unique=True)
     user_id = sq.Column(sq.Integer, sq.ForeignKey("user.id", ondelete="CASCADE"))
 
 
 class Blacklist(Base):
     __tablename__ = "blacklist"
+    id = sq.Column(sq.Integer, primary_key=True, autoincrement=True)
     vk_id = sq.Column(sq.Integer, unique=True)
     user_id = sq.Column(sq.Integer, sq.ForeignKey("user.id", ondelete="CASCADE"))
 
